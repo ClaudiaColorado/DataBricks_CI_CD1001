@@ -1,4 +1,4 @@
-name: Dynamic Databricks Notebook Deploy 1
+name: Dynamic Databricks Notebook Deploy
 on:
   push:
     branches:
@@ -18,7 +18,7 @@ jobs:
         ORIGIN_HOST=${{ secrets.DATABRICKS_ORIGIN_HOST }}
         ORIGIN_TOKEN=${{ secrets.DATABRICKS_ORIGIN_TOKEN }}
         NOTEBOOK_BASE="/Workspace/Users/linamejiaqc@gmail.com/source_ntbk"
-        NOTEBOOKS=("ntbk_1" "ntbk_2")  # Agrega más según necesitesas
+        NOTEBOOKS=("ntbk_1" "ntbk_2" "mount_adls_storage_v1")  # Agrega más según necesitesas
         mkdir -p notebooks_to_deploy
         for nb in "${NOTEBOOKS[@]}"; do
           echo "Exportando $nb en modo raw..."
@@ -128,10 +128,13 @@ jobs:
           "tasks": [
             {
               "task_key": "tarea1_notebook1",
-              "description": "Ejecuta notebook ntbk_1",
+              "description": "Ejecuta notebook ntbk_1 con parámetros",
               "notebook_task": {
                 "notebook_path": "/py/scripts/main/ntbk_1",
-                "source": "WORKSPACE"
+                "source": "WORKSPACE",
+                "base_parameters": {
+                  "storageLocation": "storage"
+                }
               },
               "existing_cluster_id": "$CLUSTER_ID",
               "timeout_seconds": 3600,
@@ -139,10 +142,15 @@ jobs:
             },
             {
               "task_key": "tarea2_notebook2",
-              "description": "Ejecuta notebook ntbk_2",
+              "description": "Ejecuta notebook ntbk_2 con parámetros",
               "notebook_task": {
                 "notebook_path": "/py/scripts/main/ntbk_2",
-                "source": "WORKSPACE"
+                "source": "WORKSPACE",
+                "base_parameters": {
+                  "inputPath": "/data/input",
+                  "outputPath": "/data/output",
+                  "processDate": "$(date +%Y-%m-%d)"
+                }
               },
               "existing_cluster_id": "$CLUSTER_ID",
               "timeout_seconds": 3600,
@@ -382,4 +390,4 @@ jobs:
         echo "✅ Cluster existente: cluster_SD configurado"
         echo "🚀 Workflow ejecutado automáticamente"
         echo ""
-
+        echo "🔗 Accede a tu workspace de Databricks para ver los resultados detallados"
